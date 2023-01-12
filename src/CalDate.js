@@ -186,8 +186,8 @@ export class CalDate {
       // hack alert - tehran has the only timezone which starts daylight saving at midnight (although stopped DST in 2022)
       // once the bug in zoneTimeToUtc is fixed, delete this hack https://github.com/marnusw/date-fns-tz/issues/222
       if (timeZone === 'Asia/Tehran') {
-        const i = new Intl.DateTimeFormat('en', { timeZone, hourCycle: 'h23', hour: 'numeric' })
-        const f = parseInt(i.format(returnVar), 10)
+        const l = returnVar.toLocaleString('en', { timeZone, hourCycle: 'h23', hour: 'numeric' })
+        const f = parseInt(l, 10)
         if (f !== this.hour) returnVar.setHours(returnVar.getHours() + 1)
       }
       return returnVar
