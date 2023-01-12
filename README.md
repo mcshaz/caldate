@@ -44,7 +44,7 @@ constructs a new CalDate instance
 **Example**:
 ```js
 // ES5
-import CalDate from 'caldate'
+import { CalDate } from 'caldate'
 // cjs
 const CalDate = require('caldate')
 

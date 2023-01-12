@@ -1,5 +1,5 @@
 import assert from 'assert'
-import CalDate from '../src/index.js'
+import { CalDate } from '../src/index.js'
 
 describe('#CalDate', function () {
   it('can return 1900-01-01 if undefined', function () {

@@ -17,14 +17,11 @@ export function isDate (d) {
  * @return {string} padded string
  */
 export function pad0 (number, len) {
-  len = len || 2
-  number = Array(len).join('0') + number.toString()
-  return number.substr(number.length - len, len)
+  return number.toString().padStart(len || 2, '0')
 }
 
 /**
  * convert string to number
- * @private
  * @param {String} str
  * @return {Number} converted number or undefined
  */
@@ -37,7 +34,6 @@ export function toNumber (str) {
 
 /**
  * extract or set year
- * @private
  * @param {Number|Date|String} year
  * @return {Number} year
  */

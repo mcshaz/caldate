@@ -9,7 +9,7 @@ declare module 'caldate' {
     duration?: string | number;
   }
 
-  class CalDate {
+  export class CalDate {
     constructor(opts?: Date | Options);
 
     set(opts?: Date | Options): CalDate;
@@ -26,6 +26,38 @@ declare module 'caldate' {
     toISOString(): string;
     toString(): string;
   }
-
-  export default CalDate;
 }
+
+/**
+ * test if a variable is a non-null object
+ * @param d variable to be tested
+ * @returns true if an object which is not equal to null
+ */
+export function isObject(arg: unknown): boolean;
+
+/**
+ * test if a variable is a JavaScript Date, including across iFrame boundaries
+ * @param d variable to be tested
+ * @returns true if a Date
+ */
+export function isDate(d: unknown): boolean;
+
+/**
+ * pad number with '0's before
+ * @param number the number to be padded
+ * @param [len] - length. default 2
+ * @return padded string
+ */
+export function pad0(number: number | string, len: number): string;
+
+/**
+ * convert string to number
+ * @return converted number or undefined
+ */
+export function toNumber(str: string): number | undefined;
+
+/**
+ * extract or set year
+ * @return the year as a number
+ */
+export function toYear(year: number | Date | string): number;
