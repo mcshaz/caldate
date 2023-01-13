@@ -1,9 +1,25 @@
-import { toYear, toNumber, isDate, pad0 } from './utils.js'
+import { toNumber, isDate, pad0 } from './utils.js'
 import { utcToZonedTime, zonedTimeToUtc } from './zonedDateFunctions.js'
 
 const PROPS = ['year', 'month', 'day', 'hour', 'minute', 'second']
 
 export class CalDate {
+  /**
+   * extract year or return current year if argument is undefined
+   * @param {Number|Date|String} year
+   * @return {Number} year
+   */
+  static toYear (year) {
+    if (!year) {
+      year = new Date().getFullYear()
+    } else if (isDate(year)) {
+      year = year.getFullYear()
+    } else if (typeof year === 'string') {
+      year = toNumber(year)
+    }
+    return year
+  }
+
   /**
    * constructs a new CalDate instance
    * @param {Object|Date} [opts] - See `set(opts)`
@@ -17,10 +33,6 @@ export class CalDate {
    */
   constructor (opts) {
     this.set(opts)
-  }
-
-  static toYear (year) {
-    return toYear(year)
   }
 
   /**

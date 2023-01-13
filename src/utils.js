@@ -31,19 +31,3 @@ export function toNumber (str) {
     return num
   }
 }
-
-/**
- * extract year or return current year if argument is undefined
- * @param {Number|Date|String} year
- * @return {Number} year
- */
-export function toYear (year) {
-  if (!year) {
-    year = new Date().getFullYear()
-  } else if (isDate(year)) {
-    year = year.getFullYear()
-  } else if (typeof year === 'string') {
-    year = toNumber(year)
-  }
-  return year
-}

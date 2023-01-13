@@ -1,3 +1,13 @@
+declare interface CalDateOptions {
+  year?: string | number;
+  month?: string | number;
+  day?: string | number;
+  hour?: string | number;
+  minute?: string | number;
+  second?: string | number;
+  duration?: string | number;
+}
+
 declare class CalDate {
   static toYear(year: any): number;
   /**
@@ -11,7 +21,7 @@ declare class CalDate {
    * caldate.month
    * //> 1
    */
-  constructor(opts?: any | Date);
+  constructor(opts?: CalDateOptions | Date);
   /**
    * set calendar date
    * @param {Object|Date} [opts] - defaults to `1900-01-01`
@@ -23,14 +33,14 @@ declare class CalDate {
    * @param {String} opts.second
    * @param {String} opts.duration - defaults to 24 hours
    */
-  set(opts?: any | Date): CalDate;
-  year: any;
-  month: any;
-  day: any;
-  hour: any;
-  minute: any;
-  second: any;
-  duration: any;
+  set(opts?: CalDateOptions | Date): CalDate;
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+  duration: number;
   /**
    * checks if Date is equal to `calDate`
    * @param {CalDate} calDate
@@ -46,7 +56,7 @@ declare class CalDate {
    * set offset per unit
    * @param {Number} number
    * @param {String} [unit='d'] - Unit in days `d`, hours `h, minutes `m`
-   * @return {Object} this
+   * @return {CalDate} this
    */
   setOffset(number: number, unit?: string): any;
   /**
@@ -54,18 +64,18 @@ declare class CalDate {
    * @param {Number} [hour]
    * @param {Number} [minute]
    * @param {Number} [second]
-   * @return {Object} this
+   * @return {CalDate} this
    */
   setTime(hour?: number, minute?: number, second?: number): any;
   /**
    * set duration in hours
    * @param {Number} duration in hours
-   * @return {Object} this
+   * @return {CalDate} this
    */
   setDuration(duration: number): any;
   /**
    * update internal data to real date
-   * @return {Object} this
+   * @return {CalDate} this
    */
   update(): any;
   /**
