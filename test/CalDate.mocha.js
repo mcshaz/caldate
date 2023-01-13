@@ -252,8 +252,7 @@ describe('handles daylight saving jumps', function () {
     const res = caldate.toTimezone('America/New_York').toISOString()
     // UTC 06:59 is NY 01:59 GMT -5
     // UTC 07:00 is NY 03:00 GMT -4
-    // !! this is an error - should either throw error or return UTC 07:00
-    assert.strictEqual(res, '2023-03-12T06:00:00.000Z')
+    assert.strictEqual(res, '2023-03-12T07:00:00.000Z')
   })
 
   it('handles times that dont exist with clock jump forward: +ve UTC offset', function () {
@@ -262,7 +261,6 @@ describe('handles daylight saving jumps', function () {
     const res = caldate.toTimezone('Australia/Sydney').toISOString()
     // UTC 15:59 is SYD 01:59 GMT +10
     // UTC 16:00 is SYD 03:00 GMT +11
-    // !! this is an error - should either throw error or return UTC 16:00
-    assert.strictEqual(res, '2023-09-30T15:00:00.000Z')
+    assert.strictEqual(res, '2023-09-30T16:00:00.000Z')
   })
 })

@@ -23,7 +23,7 @@ export function pad0 (number, len) {
 /**
  * convert string to number
  * @param {String} str
- * @return {Number} converted number or undefined
+ * @return {Number} converted number or undefined if NaN
  */
 export function toNumber (str) {
   const num = parseInt(str, 10)
@@ -33,7 +33,7 @@ export function toNumber (str) {
 }
 
 /**
- * extract or set year
+ * extract year or return current year if argument is undefined
  * @param {Number|Date|String} year
  * @return {Number} year
  */
