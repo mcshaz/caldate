@@ -4,8 +4,11 @@ env:
   node: true
   mocha: true
 extends:
-  - standard
-parserOptions:
-  ecmaVersion: 11
-  sourceType: module
+  - "eslint:recommended"
+  - "plugin:@typescript-eslint/recommended"
+parser:
+  "@typescript-eslint/parser"
+plugins:
+  - "@typescript-eslint"
+root: true
 rules: {}

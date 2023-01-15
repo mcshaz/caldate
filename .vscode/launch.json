@@ -5,13 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json" },
       "args": [
-        "-u",
-        "bdd",
         "--timeout",
         "999999",
-        "--colors",
-        "${workspaceFolder}/test"
+        "--config",
+        "${workspaceFolder}/.mocharc.json"
       ],
       "internalConsoleOptions": "openOnSessionStart",
       "name": "Mocha Tests",
@@ -30,6 +29,14 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/lib/index.cjs"
+    },
+    {
+      "name": "Rollup (pnpm)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "build"], // same script name as in package.json
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

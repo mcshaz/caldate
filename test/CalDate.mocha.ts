@@ -1,5 +1,5 @@
-import assert from 'assert'
-import { CalDate } from '../src/index.js'
+import assert from 'assert/strict'
+import { CalDate } from '../src/index'
 
 describe('#CalDate', function () {
   it('can return 1900-01-01 if undefined', function () {
@@ -161,15 +161,16 @@ describe('#CalDate', function () {
   it('throws if not a number', function () {
     const caldate = new CalDate(new Date('2000-01-01 00:00:00'))
     assert.throws(function () {
-      caldate.setOffset('this is not a number')
+      caldate.setOffset('this is not a number' as unknown as number)
     }, Error)
   })
 
-  it('can set time while keeping duration until day change', function () {
+  it('setting time modifies duration to next midnight', function () {
     const caldate = new CalDate(new Date('2000-01-01 00:00:00'))
     caldate.setTime(12)
     let res = caldate.toISOString()
     assert.strictEqual(res, '2000-01-01T12:00:00Z')
+    assert.strictEqual(caldate.duration, 12)
     res = caldate.toEndDate().toISOString()
     assert.strictEqual(res, '2000-01-02T00:00:00Z')
   })

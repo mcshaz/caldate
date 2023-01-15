@@ -1,7 +1,7 @@
 // exporting here so that only this file needs to change if changing which locale/timezone library to use
 // keep an eye on the Temporal EcmaScript spec, which might be worth using once approved
-import { zonedTimeToUtc as _zonedTimeToUtc, utcToZonedTime, toDate } from 'date-fns-tz/esm'
-
+import { zonedTimeToUtc as _zonedTimeToUtc } from 'date-fns-tz/esm'
+import toDate from 'date-fns-tz/esm/toDate'
 /**
  * @summary Get the UTC date/time from a date representing local time in a given time zone
  * @author Marnus Weststrate (date-fns-tz)
@@ -22,7 +22,7 @@ import { zonedTimeToUtc as _zonedTimeToUtc, utcToZonedTime, toDate } from 'date-
  * const result = zonedTimeToUtc(new Date(2014, 5, 25, 10, 0, 0), 'America/Los_Angeles')
  * //=> 2014-06-25T17:00:00.000Z
  */
-function zonedTimeToUtc (date, timeZone) {
+export function zonedTimeToUtc (date: Date | string | number, timeZone: string): Date {
   // currently - the date-fns-tz zonedTimeToUtc function has unexpected behaviour:
   // when set on a zoned time which doesn't exist due to daylight saving jumping forward, the hour before the jump is chosen
   // once the bug in zoneTimeToUtc is fixed, delete this hack & simply reexport the zonedTimeToUtc function
@@ -35,26 +35,3 @@ function zonedTimeToUtc (date, timeZone) {
   if (parseInt(f.format(returnVar), 10) !== date.getHours()) returnVar.setHours(returnVar.getHours() + 1)
   return returnVar
 }
-
-/*
- * @summary Get a date/time representing local time in a given time zone from the UTC date
- * @author Marnus Weststrate (date-fns-tz)
- * @license MIT
- * @description
- * Returns a date instance with values representing the local time in the time zone
- * specified of the UTC time from the date provided. In other words, when the new date
- * is formatted it will show the equivalent hours in the target time zone regardless
- * of the current system time zone.
- *
- * @param {Date|String|Number} date - the date with the relevant UTC time
- * @param {String} timeZone - the time zone to get local time for, can be an offset or IANA time zone
- * @returns {Date} the new date with the equivalent time in the time zone
- * @throws {TypeError} 2 arguments required
- *
- * @example
- * // In June 10am UTC is 6am in New York (-04:00)
- * const result = utcToZonedTime('2014-06-25T10:00:00.000Z', 'America/New_York')
- * //=> Jun 25 2014 06:00:00
- */
-
-export { zonedTimeToUtc, utcToZonedTime }
