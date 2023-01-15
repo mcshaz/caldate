@@ -1,6 +1,6 @@
-import { toNumber, isDate, pad0, isObject } from './utils'
+import { toInt, isDate, pad0 } from './utils'
 import { zonedTimeToUtc } from './zonedTimeToUtc'
-import { utcToZonedTime } from 'date-fns-tz/esm'
+import utcToZonedTime from 'date-fns-tz/esm/utcToZonedTime'
 
 interface CalDateOptions {
   year?: string | number;
@@ -13,7 +13,7 @@ interface CalDateOptions {
 }
 
 interface CalDateInterface {
-  year: number;
+  year: number | undefined;
   month: number;
   day: number;
   hour: number;
@@ -24,15 +24,24 @@ interface CalDateInterface {
 
 type offsetUnit = 'd' | 'h' | 'm'
 
+const defaultValues: Readonly<CalDateInterface> = {
+  year: 1900,
+  month: 1,
+  day: 1,
+  hour: 0,
+  minute: 0,
+  second: 0,
+  duration: 24
+}
+const PROPS = new Set(Object.keys(defaultValues).filter(k => k !== 'duration'));
 export class CalDate implements CalDateInterface {
-
-  public year = 1900;
-  public month = 1;
-  public day = 1;
-  public hour = 0;
-  public minute = 0;
-  public second = 0;
-  public duration = 24;
+  public year: number | undefined;
+  public month: number;
+  public day: number;
+  public hour: number;
+  public minute: number;
+  public second: number;
+  public duration: number;
   /**
    * constructs a new CalDate instance
    * @param {Object|Date} [opts] - See `set(opts)`
@@ -45,31 +54,28 @@ export class CalDate implements CalDateInterface {
    * //> 1
    */
   constructor (opts?: CalDateOptions | Date) {
+    if (opts) {
+      if (!(opts instanceof Date || opts instanceof CalDate)) {
+        const newOps = Object.assign({}, defaultValues, opts)
+        if (opts.month && !opts.year) newOps.year = undefined
+        opts = newOps
+      }
+    } else {
+      opts = defaultValues
+    }
     this.set(opts)
   }
 
-  /**
-   * set calendar date
-   * @param {Object|Date} [opts] - defaults to `1900-01-01`
-   * @param {String} opts.year
-   * @param {String} opts.month - January equals to 1, December to 12
-   * @param {String} opts.day
-   * @param {String} opts.hour
-   * @param {String} opts.minute
-   * @param {String} opts.second
-   * @param {String} opts.duration - defaults to 24 hours
-   */
-  set (opts?: CalDateOptions | Date) {
-    if (isDate(opts)) {
-      opts = opts as Date
-      this.year = opts.getFullYear()
-      this.month = opts.getMonth() + 1
-      this.day = opts.getDate()
-      this.hour = opts.getHours()
-      this.minute = opts.getMinutes()
-      this.second = opts.getSeconds()
+  set (opts: CalDateOptions | Date) {
+    if (opts instanceof Date) {
+      this.assignDateToSelf(opts as Date)
+      this.duration = defaultValues.duration
     } else {
-      this.transferOptsToSelf(opts as CalDateOptions);
+      Object.entries(opts).forEach(([k, v]) => {
+        if (PROPS.has(k)) (this as any)[k] = toInt(v)
+      })
+      // assigning separately here as duration should retain decimal precision
+      if (opts.duration) this.duration = Number(opts.duration)
     }
     return this
   }
@@ -103,7 +109,7 @@ export class CalDate implements CalDateInterface {
       unit = unit || 'd'
       number = Number(number)
       if (isNaN(number)) {
-        throw new Error('Number required')
+        throw new TypeError('Number required')
       }
 
       const o = { day: 0 } as {day: number; hour: number; minute: number; second: number }
@@ -133,14 +139,13 @@ export class CalDate implements CalDateInterface {
 
   /**
    * set hour, minute or second while altering duration so it remains the number of hours until midnight
-   * @param {Number} [hour]
-   * @param {Number} [minute]
-   * @param {Number} [second]
-   * @return {Object} this
+   * @param [hour] default 0
+   * @param [minute] default 0
+   * @param [second] default 0
    */
-  setTime (hour: number = 0, minute: number = 0, second: number = 0): this {
+  setTime (hour = 0, minute = 0, second = 0): this {
     // the holiday usually ends at midnight - if this is not the case set different duration explicitely
-    this.transferOptsToSelf({
+    Object.assign(this, {
       hour,
       minute,
       second,
@@ -164,9 +169,7 @@ export class CalDate implements CalDateInterface {
    */
   update (): this {
     if (this.year) {
-      const d = new CalDate(this.toDate())
-      d.duration = undefined as any
-      this.transferOptsToSelf(d)
+      this.assignDateToSelf(this.toDate())
     }
     return this
   }
@@ -210,7 +213,7 @@ export class CalDate implements CalDateInterface {
    */
   toDate (): Date {
     return new Date(
-      this.year, this.month - 1, this.day,
+      this.year!, this.month - 1, this.day,
       this.hour, this.minute, this.second, 0
     )
   }
@@ -228,7 +231,7 @@ export class CalDate implements CalDateInterface {
   toString (iso = false) {
     const d = new CalDate(this.toDate())
     return (
-      pad0(d.year, 4) + '-' +
+      pad0(d.year!, 4) + '-' +
       pad0(d.month) + '-' +
       pad0(d.day) +
       (iso ? 'T' : ' ') +
@@ -238,16 +241,13 @@ export class CalDate implements CalDateInterface {
       (iso ? 'Z' : '')
     )
   }
-
-  private transferOptsToSelf(opts: CalDateOptions) {
-    if (isObject(opts)) {
-      Object.entries(opts as Record<string, string | number | undefined>).forEach(([k, v]) => {
-        if (k in this) {
-          const numbr = toNumber(v)
-          if (numbr !== undefined) (this as any)[k] = numbr
-        }
-      })
-    }
+  private assignDateToSelf(dt: Date) {
+    this.year = dt.getFullYear()
+    this.month = dt.getMonth() + 1
+    this.day = dt.getDate()
+    this.hour = dt.getHours()
+    this.minute = dt.getMinutes()
+    this.second = dt.getSeconds()
   }
   /**
    * extract year or return current year if argument is undefined
@@ -260,7 +260,7 @@ export class CalDate implements CalDateInterface {
       } else if (isDate(year)) {
         return (year as Date).getFullYear()
       } else if (typeof year === 'string') {
-        return toNumber(year) as number
+        return toInt(year) as number
       }
       return year as number
     }

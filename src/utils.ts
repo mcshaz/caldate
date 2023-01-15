@@ -25,7 +25,7 @@ export function pad0 (number: number | string, len = 2): string {
  * @param {String} str
  * @return {Number} converted number or undefined if NaN
  */
-export function toNumber (str: string | number | undefined): number | undefined {
+export function toInt (str: string | number | undefined): number | undefined {
   const num = parseInt(str as string, 10)
   if (!isNaN(num)) {
     return num

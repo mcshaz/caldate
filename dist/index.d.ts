@@ -1,4 +1,4 @@
-export { utcToZonedTime } from 'date-fns-tz/esm';
+export { default as utcToZonedTime } from 'date-fns-tz/esm/utcToZonedTime';
 
 interface CalDateOptions {
     year?: string | number;
@@ -10,7 +10,7 @@ interface CalDateOptions {
     duration?: string | number;
 }
 interface CalDateInterface {
-    year: number;
+    year: number | undefined;
     month: number;
     day: number;
     hour: number;
@@ -20,7 +20,7 @@ interface CalDateInterface {
 }
 type offsetUnit = 'd' | 'h' | 'm';
 declare class CalDate implements CalDateInterface {
-    year: number;
+    year: number | undefined;
     month: number;
     day: number;
     hour: number;
@@ -39,18 +39,7 @@ declare class CalDate implements CalDateInterface {
      * //> 1
      */
     constructor(opts?: CalDateOptions | Date);
-    /**
-     * set calendar date
-     * @param {Object|Date} [opts] - defaults to `1900-01-01`
-     * @param {String} opts.year
-     * @param {String} opts.month - January equals to 1, December to 12
-     * @param {String} opts.day
-     * @param {String} opts.hour
-     * @param {String} opts.minute
-     * @param {String} opts.second
-     * @param {String} opts.duration - defaults to 24 hours
-     */
-    set(opts?: CalDateOptions | Date): this;
+    set(opts: CalDateOptions | Date): this;
     /**
      * checks if Date is equal to `calDate`
      * @param {CalDate} calDate
@@ -69,10 +58,9 @@ declare class CalDate implements CalDateInterface {
     setOffset(number?: number, unit?: offsetUnit): this;
     /**
      * set hour, minute or second while altering duration so it remains the number of hours until midnight
-     * @param {Number} [hour]
-     * @param {Number} [minute]
-     * @param {Number} [second]
-     * @return {Object} this
+     * @param [hour] default 0
+     * @param [minute] default 0
+     * @param [second] default 0
      */
     setTime(hour?: number, minute?: number, second?: number): this;
     /**
@@ -114,7 +102,7 @@ declare class CalDate implements CalDateInterface {
      * get Date as String `YYYY-MM-DD HH:MM:SS`
      */
     toString(iso?: boolean): string;
-    private transferOptsToSelf;
+    private assignDateToSelf;
     /**
      * extract year or return current year if argument is undefined
      * @param {Number|Date|String} year
@@ -137,7 +125,7 @@ declare function pad0(number: number | string, len?: number): string;
  * @param {String} str
  * @return {Number} converted number or undefined if NaN
  */
-declare function toNumber(str: string | number | undefined): number | undefined;
+declare function toInt(str: string | number | undefined): number | undefined;
 
 /**
  * @summary Get the UTC date/time from a date representing local time in a given time zone
@@ -161,4 +149,4 @@ declare function toNumber(str: string | number | undefined): number | undefined;
  */
 declare function zonedTimeToUtc(date: Date | string | number, timeZone: string): Date;
 
-export { CalDate, isDate, isObject, pad0, toNumber, zonedTimeToUtc };
+export { CalDate, isDate, isObject, pad0, toInt as toNumber, zonedTimeToUtc };

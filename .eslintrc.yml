@@ -11,4 +11,6 @@ parser:
 plugins:
   - "@typescript-eslint"
 root: true
-rules: {}
+rules: 
+  "@typescript-eslint/no-non-null-assertion": 0
+

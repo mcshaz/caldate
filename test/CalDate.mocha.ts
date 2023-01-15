@@ -8,6 +8,16 @@ describe('#CalDate', function () {
     assert.strictEqual(res, '1900-01-01 00:00:00')
   })
 
+  it('can explicitly have date set to undefined', function() {
+    const caldate = new CalDate({year: undefined, month: 1, day: 1})
+    assert.strictEqual(caldate.year, undefined)
+  })
+
+  it('will set year undefined if instantiated with date and month', function() {
+    const caldate = new CalDate({month: 1, day: 1})
+    assert.strictEqual(caldate.year, undefined)
+  })
+
   it('can set year 2000', function () {
     const caldate = new CalDate()
     caldate.set({ year: 2000 })
@@ -117,16 +127,25 @@ describe('#CalDate', function () {
     assert.strictEqual(caldate.toString(), '2017-01-01 00:00:00')
   })
 
-  it('can return a end date', function () {
+  it('can return an end date', function () {
     const caldate = new CalDate(new Date('2000-01-01 00:00:00'))
     const res = caldate.toEndDate().toISOString()
     assert.strictEqual(res, '2000-01-02T00:00:00Z')
   })
 
-  it('can set offset in days', function () {
+  it('returns an end date with default duration', function () {
     const caldate = new CalDate(new Date('2000-01-01 00:00:00'))
+    const res = caldate.toEndDate().duration
+    assert.strictEqual(res, 24)
+  })
+
+  it('can set offset in days', function () {
+    let caldate = new CalDate(new Date('2000-01-01 00:00:00'))
     caldate.setOffset(5)
-    const res = caldate.toEndDate().toISOString()
+    let res = caldate.toISOString()
+    assert.strictEqual(res, '2000-01-06T00:00:00Z')
+    caldate = caldate.toEndDate()
+    res = caldate.toISOString()
     assert.strictEqual(res, '2000-01-07T00:00:00Z')
   })
 
@@ -165,7 +184,7 @@ describe('#CalDate', function () {
     }, Error)
   })
 
-  it('setting time modifies duration to next midnight', function () {
+  it('setting time modifies duration so toEndDate remains midnight', function () {
     const caldate = new CalDate(new Date('2000-01-01 00:00:00'))
     caldate.setTime(12)
     let res = caldate.toISOString()
@@ -183,6 +202,15 @@ describe('#CalDate', function () {
     assert.strictEqual(res, '2000-01-01T12:00:00Z')
     res = caldate.toEndDate().toISOString()
     assert.strictEqual(res, '2000-01-02T11:00:00Z')
+  })
+
+  it('can clone self with new argument', function() {
+    const caldate = new CalDate(new Date('2000-01-01 00:00:00'))
+    caldate.setTime(12)
+    caldate.setDuration(23.5)
+    const res = new CalDate(caldate)
+    assert.notEqual(res, caldate)
+    assert.deepStrictEqual(res, caldate)
   })
 
   it('can get year from a number', function () {

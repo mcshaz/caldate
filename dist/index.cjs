@@ -1,7 +1,8 @@
 'use strict';
 
-var esm = require('date-fns-tz/esm');
-var toDate = require('date-fns-tz/esm/toDate');
+var _zonedTimeToUtc = require('date-fns-tz/zonedTimeToUtc');
+var toDate = require('date-fns-tz/toDate');
+var utcToZonedTime = require('date-fns-tz/utcToZonedTime');
 
 // src/utils.ts
 function objectToString(o) {
@@ -16,7 +17,7 @@ function isDate(d) {
 function pad0(number, len = 2) {
   return number.toString().padStart(len, "0");
 }
-function toNumber(str) {
+function toInt(str) {
   const num = parseInt(str, 10);
   if (!isNaN(num)) {
     return num;
@@ -24,34 +25,47 @@ function toNumber(str) {
 }
 function zonedTimeToUtc(date, timeZone) {
   date = toDate(date);
-  const returnVar = esm.zonedTimeToUtc(date, timeZone);
+  const returnVar = _zonedTimeToUtc(date, timeZone);
   const f = new Intl.DateTimeFormat("en", { timeZone, hourCycle: "h23", hour: "numeric" });
   if (parseInt(f.format(returnVar), 10) !== date.getHours())
     returnVar.setHours(returnVar.getHours() + 1);
   return returnVar;
 }
+var defaultValues = {
+  year: 1900,
+  month: 1,
+  day: 1,
+  hour: 0,
+  minute: 0,
+  second: 0,
+  duration: 24
+};
+var PROPS = new Set(Object.keys(defaultValues).filter((k) => k !== "duration"));
 var CalDate = class {
   constructor(opts) {
-    this.year = 1900;
-    this.month = 1;
-    this.day = 1;
-    this.hour = 0;
-    this.minute = 0;
-    this.second = 0;
-    this.duration = 24;
+    if (opts) {
+      if (!(opts instanceof Date || opts instanceof CalDate)) {
+        const newOps = Object.assign({}, defaultValues, opts);
+        if (opts.month && !opts.year)
+          newOps.year = void 0;
+        opts = newOps;
+      }
+    } else {
+      opts = defaultValues;
+    }
     this.set(opts);
   }
   set(opts) {
-    if (isDate(opts)) {
-      opts = opts;
-      this.year = opts.getFullYear();
-      this.month = opts.getMonth() + 1;
-      this.day = opts.getDate();
-      this.hour = opts.getHours();
-      this.minute = opts.getMinutes();
-      this.second = opts.getSeconds();
+    if (opts instanceof Date) {
+      this.assignDateToSelf(opts);
+      this.duration = defaultValues.duration;
     } else {
-      this.transferOptsToSelf(opts);
+      Object.entries(opts).forEach(([k, v]) => {
+        if (PROPS.has(k))
+          this[k] = toInt(v);
+      });
+      if (opts.duration)
+        this.duration = Number(opts.duration);
     }
     return this;
   }
@@ -71,7 +85,7 @@ var CalDate = class {
       unit = unit || "d";
       number = Number(number);
       if (isNaN(number)) {
-        throw new Error("Number required");
+        throw new TypeError("Number required");
       }
       const o = { day: 0 };
       if (unit === "d") {
@@ -97,7 +111,7 @@ var CalDate = class {
     return this;
   }
   setTime(hour = 0, minute = 0, second = 0) {
-    this.transferOptsToSelf({
+    Object.assign(this, {
       hour,
       minute,
       second,
@@ -112,9 +126,7 @@ var CalDate = class {
   }
   update() {
     if (this.year) {
-      const d = new CalDate(this.toDate());
-      d.duration = void 0;
-      this.transferOptsToSelf(d);
+      this.assignDateToSelf(this.toDate());
     }
     return this;
   }
@@ -131,7 +143,7 @@ var CalDate = class {
     return this.toDate();
   }
   fromTimezone(dateUTC, timezone) {
-    this.set(timezone ? esm.utcToZonedTime(dateUTC, timezone) : dateUTC);
+    this.set(timezone ? utcToZonedTime(dateUTC, timezone) : dateUTC);
     return this;
   }
   toDate() {
@@ -152,16 +164,13 @@ var CalDate = class {
     const d = new CalDate(this.toDate());
     return pad0(d.year, 4) + "-" + pad0(d.month) + "-" + pad0(d.day) + (iso ? "T" : " ") + pad0(d.hour) + ":" + pad0(d.minute) + ":" + pad0(d.second) + (iso ? "Z" : "");
   }
-  transferOptsToSelf(opts) {
-    if (isObject(opts)) {
-      Object.entries(opts).forEach(([k, v]) => {
-        if (k in this) {
-          const numbr = toNumber(v);
-          if (numbr !== void 0)
-            this[k] = numbr;
-        }
-      });
-    }
+  assignDateToSelf(dt) {
+    this.year = dt.getFullYear();
+    this.month = dt.getMonth() + 1;
+    this.day = dt.getDate();
+    this.hour = dt.getHours();
+    this.minute = dt.getMinutes();
+    this.second = dt.getSeconds();
   }
   static toYear(year) {
     if (!year) {
@@ -169,7 +178,7 @@ var CalDate = class {
     } else if (isDate(year)) {
       return year.getFullYear();
     } else if (typeof year === "string") {
-      return toNumber(year);
+      return toInt(year);
     }
     return year;
   }
@@ -195,13 +204,10 @@ var CalDate = class {
  * //=> 2014-06-25T17:00:00.000Z
  */
 
-Object.defineProperty(exports, 'utcToZonedTime', {
-  enumerable: true,
-  get: function () { return esm.utcToZonedTime; }
-});
+exports.utcToZonedTime = utcToZonedTime;
 exports.CalDate = CalDate;
 exports.isDate = isDate;
 exports.isObject = isObject;
 exports.pad0 = pad0;
-exports.toNumber = toNumber;
+exports.toNumber = toInt;
 exports.zonedTimeToUtc = zonedTimeToUtc;
