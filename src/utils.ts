@@ -1,29 +1,17 @@
-function objectToString (o: unknown) {
-  return Object.prototype.toString.call(o) as string
-}
-
-export function isObject (arg: unknown) {
-  return typeof arg === 'object' && arg !== null
-}
-
-export function isDate (d: unknown) {
-  return isObject(d) && objectToString(d) === '[object Date]'
-}
-
 /**
- * pad number with `0`
- * @param {number} number
- * @param {number} [len] - length
- * @return {string} padded string
+ * pads a number with `0`s on the left
+ * @param number The number or string to be padded
+ * @param [len] - length of final string. default 2
+ * @return padded string
  */
 export function pad0 (number: number | string, len = 2): string {
   return number.toString().padStart(len, '0')
 }
 
 /**
- * convert string to number
- * @param {String} str
- * @return {Number} converted number or undefined if NaN
+ * convert string to an int if the string begins with numeric values
+ * @param str The string to be parsed
+ * @return The converted number or undefined if NaN
  */
 export function toInt (str: string | number | undefined): number | undefined {
   const num = parseInt(str as string, 10)

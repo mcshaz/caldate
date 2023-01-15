@@ -1,4 +1,4 @@
-import { toInt, isDate, pad0 } from './utils'
+import { toInt, pad0 } from './utils'
 import { zonedTimeToUtc } from './zonedTimeToUtc'
 import utcToZonedTime from 'date-fns-tz/esm/utcToZonedTime'
 
@@ -44,10 +44,9 @@ export class CalDate implements CalDateInterface {
   public duration: number;
   /**
    * constructs a new CalDate instance
-   * @param {Object|Date} [opts] - See `set(opts)`
    * @example
    * const CalDate = require('caldate')
-   * const caldate = new CalDate('2000-01-01 12:00:00')
+   * const caldate = new CalDate(new Date('2000-01-01 12:00:00'))
    * caldate.year
    * //> 2000
    * caldate.month
@@ -55,7 +54,9 @@ export class CalDate implements CalDateInterface {
    */
   constructor (opts?: CalDateOptions | Date) {
     if (opts) {
-      if (!(opts instanceof Date || opts instanceof CalDate)) {
+      if (opts instanceof Date) {
+        this.duration = defaultValues.duration
+      } else if (!(opts instanceof CalDate)) {
         const newOps = Object.assign({}, defaultValues, opts)
         if (opts.month && !opts.year) newOps.year = undefined
         opts = newOps
@@ -69,10 +70,9 @@ export class CalDate implements CalDateInterface {
   set (opts: CalDateOptions | Date) {
     if (opts instanceof Date) {
       this.assignDateToSelf(opts as Date)
-      this.duration = defaultValues.duration
     } else {
-      Object.entries(opts).forEach(([k, v]) => {
-        if (PROPS.has(k)) (this as any)[k] = toInt(v)
+      Object.keys(opts).forEach((k) => {
+        if (PROPS.has(k)) (this as any)[k] = toInt((opts as any)[k])
       })
       // assigning separately here as duration should retain decimal precision
       if (opts.duration) this.duration = Number(opts.duration)
@@ -257,7 +257,7 @@ export class CalDate implements CalDateInterface {
     static toYear (year?: number | Date | string): number {
       if (!year) {
         return new Date().getFullYear()
-      } else if (isDate(year)) {
+      } else if (year instanceof Date) {
         return (year as Date).getFullYear()
       } else if (typeof year === 'string') {
         return toInt(year) as number
