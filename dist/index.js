@@ -1,18 +1,7 @@
-import _zonedTimeToUtc from 'date-fns-tz/esm/zonedTimeToUtc';
-import toDate from 'date-fns-tz/esm/toDate';
-import utcToZonedTime from 'date-fns-tz/esm/utcToZonedTime';
-export { default as utcToZonedTime } from 'date-fns-tz/esm/utcToZonedTime';
+import { toDate, zonedTimeToUtc as zonedTimeToUtc$1, utcToZonedTime } from 'date-fns-tz';
+export { utcToZonedTime } from 'date-fns-tz';
 
 // src/utils.ts
-function objectToString(o) {
-  return Object.prototype.toString.call(o);
-}
-function isObject(arg) {
-  return typeof arg === "object" && arg !== null;
-}
-function isDate(d) {
-  return isObject(d) && objectToString(d) === "[object Date]";
-}
 function pad0(number, len = 2) {
   return number.toString().padStart(len, "0");
 }
@@ -24,7 +13,7 @@ function toInt(str) {
 }
 function zonedTimeToUtc(date, timeZone) {
   date = toDate(date);
-  const returnVar = _zonedTimeToUtc(date, timeZone);
+  const returnVar = zonedTimeToUtc$1(date, timeZone);
   const f = new Intl.DateTimeFormat("en", { timeZone, hourCycle: "h23", hour: "numeric" });
   if (parseInt(f.format(returnVar), 10) !== date.getHours())
     returnVar.setHours(returnVar.getHours() + 1);
@@ -43,7 +32,9 @@ var PROPS = new Set(Object.keys(defaultValues).filter((k) => k !== "duration"));
 var CalDate = class {
   constructor(opts) {
     if (opts) {
-      if (!(opts instanceof Date || opts instanceof CalDate)) {
+      if (opts instanceof Date) {
+        this.duration = defaultValues.duration;
+      } else if (!(opts instanceof CalDate)) {
         const newOps = Object.assign({}, defaultValues, opts);
         if (opts.month && !opts.year)
           newOps.year = void 0;
@@ -57,11 +48,10 @@ var CalDate = class {
   set(opts) {
     if (opts instanceof Date) {
       this.assignDateToSelf(opts);
-      this.duration = defaultValues.duration;
     } else {
-      Object.entries(opts).forEach(([k, v]) => {
+      Object.keys(opts).forEach((k) => {
         if (PROPS.has(k))
-          this[k] = toInt(v);
+          this[k] = toInt(opts[k]);
       });
       if (opts.duration)
         this.duration = Number(opts.duration);
@@ -174,7 +164,7 @@ var CalDate = class {
   static toYear(year) {
     if (!year) {
       return new Date().getFullYear();
-    } else if (isDate(year)) {
+    } else if (year instanceof Date) {
       return year.getFullYear();
     } else if (typeof year === "string") {
       return toInt(year);
@@ -203,4 +193,4 @@ var CalDate = class {
  * //=> 2014-06-25T17:00:00.000Z
  */
 
-export { CalDate, isDate, isObject, pad0, toInt as toNumber, zonedTimeToUtc };
+export { CalDate, pad0, toInt, zonedTimeToUtc };

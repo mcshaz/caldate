@@ -1,6 +1,6 @@
 import { toInt, pad0 } from './utils'
 import { zonedTimeToUtc } from './zonedTimeToUtc'
-import utcToZonedTime from 'date-fns-tz/esm/utcToZonedTime'
+import { utcToZonedTime } from 'date-fns-tz'
 
 interface CalDateOptions {
   year?: string | number;

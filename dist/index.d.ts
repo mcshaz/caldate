@@ -1,4 +1,4 @@
-export { default as utcToZonedTime } from 'date-fns-tz/esm/utcToZonedTime';
+export { utcToZonedTime } from 'date-fns-tz';
 
 interface CalDateOptions {
     year?: string | number;
@@ -29,10 +29,9 @@ declare class CalDate implements CalDateInterface {
     duration: number;
     /**
      * constructs a new CalDate instance
-     * @param {Object|Date} [opts] - See `set(opts)`
      * @example
      * const CalDate = require('caldate')
-     * const caldate = new CalDate('2000-01-01 12:00:00')
+     * const caldate = new CalDate(new Date('2000-01-01 12:00:00'))
      * caldate.year
      * //> 2000
      * caldate.month
@@ -111,19 +110,17 @@ declare class CalDate implements CalDateInterface {
     static toYear(year?: number | Date | string): number;
 }
 
-declare function isObject(arg: unknown): boolean;
-declare function isDate(d: unknown): boolean;
 /**
- * pad number with `0`
- * @param {number} number
- * @param {number} [len] - length
- * @return {string} padded string
+ * pads a number with `0`s on the left
+ * @param number The number or string to be padded
+ * @param [len] - length of final string. default 2
+ * @return padded string
  */
 declare function pad0(number: number | string, len?: number): string;
 /**
- * convert string to number
- * @param {String} str
- * @return {Number} converted number or undefined if NaN
+ * convert string to an int if the string begins with numeric values
+ * @param str The string to be parsed
+ * @return The converted number or undefined if NaN
  */
 declare function toInt(str: string | number | undefined): number | undefined;
 
@@ -149,4 +146,4 @@ declare function toInt(str: string | number | undefined): number | undefined;
  */
 declare function zonedTimeToUtc(date: Date | string | number, timeZone: string): Date;
 
-export { CalDate, isDate, isObject, pad0, toInt as toNumber, zonedTimeToUtc };
+export { CalDate, pad0, toInt, zonedTimeToUtc };

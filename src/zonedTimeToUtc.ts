@@ -1,7 +1,6 @@
 // exporting here so that only this file needs to change if changing which locale/timezone library to use
 // keep an eye on the Temporal EcmaScript spec, which might be worth using once approved
-import _zonedTimeToUtc from 'date-fns-tz/esm/zonedTimeToUtc'
-import toDate from 'date-fns-tz/esm/toDate'
+import { zonedTimeToUtc as _zonedTimeToUtc, toDate } from 'date-fns-tz'
 /**
  * @summary Get the UTC date/time from a date representing local time in a given time zone
  * @author Marnus Weststrate (date-fns-tz)
